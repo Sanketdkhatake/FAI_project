@@ -286,6 +286,28 @@ tr:last-child td{border-bottom:0}
 .foot{margin-top:34px;text-align:center;color:var(--muted);font-size:13px}
 .errbox{max-width:560px;margin:40px auto;text-align:center}
 
+
+
+.bsec{font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--gold);margin:16px 0 4px}.bsec:first-child{margin-top:4px}
+.qline.sub{border-top:1px dashed var(--line);margin-top:4px;padding-top:8px;font-weight:700}.qline.qi{padding:1px 0 1px 14px;font-size:14px;color:var(--muted)}
+/* ---- food ordering ---- */
+.veg{display:inline-block;width:14px;height:14px;border:2px solid;border-radius:3px;position:relative;margin-right:8px;vertical-align:-2px}.veg::after{content:"";position:absolute;inset:2px;border-radius:50%;background:currentColor}.veg.v{color:#1b8f5a}.veg.n{color:#c13a2f}
+#cartBar{position:sticky;bottom:-26px;margin:16px -26px -26px;padding:14px 26px calc(14px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line);z-index:3}
+.cartin{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.otrack{padding:16px 0;border-bottom:1px solid var(--line)}.otrack:last-child{border-bottom:0;padding-bottom:0}.otrack:first-child{padding-top:0}
+.track{display:flex;list-style:none;margin:14px 0 4px;padding:0}
+.track li{flex:1;text-align:center;position:relative;font-size:12px;color:var(--muted)}
+.track li i{display:block;width:16px;height:16px;border-radius:50%;background:var(--surface2);border:2px solid var(--line);margin:0 auto 6px;position:relative;z-index:1}
+.track li::before{content:"";position:absolute;top:7px;left:-50%;width:100%;height:3px;background:var(--line)}.track li:first-child::before{display:none}
+.track li.done i{background:var(--ok);border-color:var(--ok)}.track li.done::before,.track li.now::before{background:var(--ok)}
+.track li.now i{background:var(--gold2);border-color:var(--gold);animation:pulse2 1.6s infinite}.track li.now{color:var(--ink);font-weight:700}
+@keyframes pulse2{0%{box-shadow:0 0 0 0 rgba(201,119,90,.5)}70%,100%{box-shadow:0 0 0 9px transparent}}
+.kcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px;align-items:start}
+.kcol{background:var(--surface2);border:1px solid var(--line);border-radius:18px;padding:12px;display:grid;gap:12px;min-height:120px;align-content:start}
+.kcol>h3{font-size:15px;display:flex;justify-content:space-between;align-items:center;margin:2px 4px 0}
+.ord{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--gold2);border-radius:14px;padding:14px;display:grid;gap:10px}.ord.late{border-left-color:var(--bad)}
+#menuTabs{flex:1 1 100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}#menuTabs button{flex:none;white-space:nowrap}
+.olist{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:14px}.olist li{display:flex;justify-content:space-between;gap:10px}
 /* ================= interaction layer ================= */
 :root{--ease:cubic-bezier(.22,.8,.3,1)}
 body,.card,.top,.gtop,.modal,input,select,textarea{transition:background-color .35s,color .35s,border-color .25s,box-shadow .25s}
@@ -427,7 +449,19 @@ const TYPES={
  Suite:{price:9500,cap:4,beds:'King bed + lounge',desc:'A separate living area, the best views and priority service.',am:['Private lounge','Bathtub','Priority service']}
 };
 const PROMOS={WELCOME10:{pct:10,desc:'10% off any stay'},STAY3:{pct:15,minNights:3,desc:'15% off stays of 3 nights or more'}};
-const MENU=[['Masala chai',120],['Fresh lime soda',150],['Club sandwich',320],['Paneer tikka',420],['Veg biryani',380],['Chocolate brownie',250]];
+const FOOD_CATS=['Breakfast','Snacks','Mains','Desserts','Drinks'];
+const MENU=[
+ ['f01','Breakfast','Masala omelette',220,0,10],['f02','Breakfast','Poha with sev',160,1,8],['f03','Breakfast','Idli sambar',180,1,10],['f04','Breakfast','Aloo paratha with curd',200,1,12],
+ ['f05','Snacks','Paneer tikka',420,1,15],['f06','Snacks','Chicken wings',450,0,18],['f07','Snacks','Veg club sandwich',320,1,10],['f08','Snacks','French fries',180,1,8],
+ ['f09','Mains','Veg biryani',380,1,20],['f10','Mains','Chicken biryani',450,0,22],['f11','Mains','Dal makhani with naan',360,1,18],['f12','Mains','Butter chicken with naan',480,0,20],['f13','Mains','Pasta arrabbiata',340,1,15],
+ ['f14','Desserts','Chocolate brownie',250,1,6],['f15','Desserts','Gulab jamun (2 pcs)',160,1,5],['f16','Desserts','Ice cream (2 scoops)',140,1,3],
+ ['f17','Drinks','Masala chai',120,1,5],['f18','Drinks','Filter coffee',140,1,5],['f19','Drinks','Fresh lime soda',150,1,4],['f20','Drinks','Cold coffee',180,1,6]
+].map(x=>({id:x[0],cat:x[1],name:x[2],price:x[3],veg:!!x[4],mins:x[5]}));
+const menuItem=id=>MENU.find(m=>m.id===id);
+const CHEFS=['Chef Arjun','Chef Meera','Chef Imran'],WAITERS=['Ravi','Sana','Joseph'];
+const ACTIVE=['placed','preparing','ready','delivering'];
+const ORD={placed:['info','Order received'],preparing:['occ','Being prepared'],ready:['brand','Ready for pickup'],delivering:['warn','On the way'],delivered:['ok','Delivered'],cancelled:['neutral','Cancelled']};
+const order=id=>S.orders.find(o=>o.id===id);
 const STAFF_HK=['Lakshmi','Mohan','Farida'],STAFF_TECH=['Ramesh (Electrical)','Sunita (Plumbing)','Imran (HVAC)'];
 const NAMES=['Aarav Sharma','Priya Nair','Rohan Mehta','Sneha Kulkarni','Vikram Singh','Ananya Iyer','Karan Patil','Meera Desai','Arjun Reddy','Isha Gupta','Rahul Joshi','Neha Verma','Siddharth Rao','Kavya Menon','Aditya Kapoor','Pooja Shah'];
 
@@ -456,14 +490,16 @@ function quote(r,ci,co,o){
   const sub=base+addons-disc,gst=Math.round(sub*S.settings.gst/100);
   return{n,base,add,addons,disc,promo:disc?o.promo:null,sub,gst,gstPct:S.settings.gst,total:sub+gst};
 }
-const extrasSum=b=>sum((b.extras||[]).map(x=>x.price*x.qty));
-const billTotal=b=>b.total+extrasSum(b);
+/* the bill is always computed from the live orders, so it can never drift out of sync with them */
+const extrasSum=b=>sum((b.extras||[]).filter(x=>!x.orderId).map(x=>x.price*x.qty));
+const foodSum=b=>sum((S.orders||[]).filter(o=>o.bookingId===b.id&&o.status!=='cancelled').map(o=>o.total));
+const billTotal=b=>b.total+extrasSum(b)+foodSum(b);
 
 /* seed */
 function seed(){
   seedv=7;const t=today();
-  S={v:2,seq:10001,tid:1,rooms:[],bookings:[],tasks:[],tickets:[],alerts:[],history:[],reviews:[],
-     settings:{auto:true,dynamic:false,speed:1,running:true,gst:12,eco:15,pin:'1234'},
+  S={v:2,seq:10001,tid:1,rooms:[],bookings:[],tasks:[],tickets:[],alerts:[],history:[],reviews:[],orders:[],oseq:1001,
+     settings:{auto:true,dynamic:false,speed:1,running:true,gst:12,eco:15,pin:'1234',kitchen:true,foodAuto:true},
      energy:{kwh:142.6,saved:31.4,load:0,series:[]},stats:{recs:0,queries:0,actions:0,anoms:0}};
   const layout={1:['Standard','Standard','Standard','Standard','Family','Family'],2:['Standard','Standard','Standard','Deluxe','Deluxe','Deluxe'],
     3:['Deluxe','Deluxe','Deluxe','Deluxe','Suite','Suite'],4:['Deluxe','Deluxe','Suite','Suite','Suite','Suite']};
@@ -485,6 +521,10 @@ function seed(){
     const r=room(x[0]),ci=addDays(t,x[1]),co=addDays(ci,x[2]),nm=NAMES[(i+11)%NAMES.length],q=quote(r,ci,co,{guests:2});
     S.bookings.push({id:newId(),name:nm,phone:x[3]||String(800000000+i*7777777).padStart(10,'8'),email:nm.split(' ')[0].toLowerCase()+'@example.com',roomId:x[0],checkIn:ci,checkOut:co,
       guests:Math.min(r.cap,2),pref:{temp:23,type:'Any'},opts:{},requests:'',extras:[],status:'booked',quote:q,total:q.total,created:Date.now()-3600e3*(5+i*7)})});
+  const bIn=n=>S.bookings.find(b=>b.roomId===n&&b.status==='checked-in'),mn=m=>Date.now()-m*60000;
+  let o1=createOrder(bIn(301),{f11:1,f17:2},'');Object.assign(o1,{status:'delivered',chef:'Chef Meera',waiter:'Sana',t:{placed:mn(42),preparing:mn(39),ready:mn(25),delivering:mn(23),delivered:mn(17)}});
+  let o2=createOrder(bIn(103),{f09:1,f17:1},'Less spicy please');Object.assign(o2,{status:'preparing',chef:'Chef Arjun',t:{placed:mn(7),preparing:mn(5)}});
+  let o3=createOrder(bIn(202),{f07:1,f20:1},'');o3.t.placed=mn(1);
   [102,203].forEach((n,i)=>{room(n).status='cleaning';addTask(n,'checkout','Guest checked out',null,Date.now()-60000*(18+i*25))});
   room(306).status='maintenance';room(306).flag=true;
   S.tickets.push({id:'T'+S.tid++,roomId:306,title:'Bathroom tap leaking',detail:'Reported by housekeeping during inspection.',severity:'medium',source:'Staff report',status:'open',assignee:'',created:Date.now()-3600e3*3});
@@ -498,6 +538,7 @@ function seed(){
   save();
 }
 /* data validation (guards against corrupted or hand-edited storage) */
+function normalize(d){d.orders=Array.isArray(d.orders)?d.orders.filter(o=>o&&o.id&&o.t&&Array.isArray(o.items)):[];d.oseq=d.oseq||1001;d.settings=Object.assign({kitchen:true,foodAuto:true},d.settings)}
 function validData(d){
   try{
     if(!d||d.v!==2||!Array.isArray(d.rooms)||d.rooms.length!==24||!Array.isArray(d.bookings)||!Array.isArray(d.tasks)||!Array.isArray(d.tickets)||!Array.isArray(d.alerts)||!Array.isArray(d.history)||!Array.isArray(d.reviews))return false;
@@ -612,6 +653,7 @@ function checkInBooking(id,quiet){
 }
 function checkOutBooking(id){
   const b=booking(id),r=b&&room(b.roomId);if(!b||b.status!=='checked-in')return toast('This guest is not checked in','bad');
+  S.orders.filter(o=>o.bookingId===b.id&&ACTIVE.includes(o.status)).forEach(o=>{o.status='cancelled';o.cancelReason='Guest checked out';o.t.cancelled=Date.now();b.extras=b.extras.filter(x=>x.orderId!==o.id)});
   b.status='checked-out';b.outAt=Date.now();r.bookingId=null;r.ac={mode:'off',set:24};r.lights=false;r.presence=false;r.pw=[];r.fault=null;
   r.status=S.tickets.some(t=>t.roomId===r.id&&t.status!=='resolved')?'maintenance':'cleaning';
   if(r.status==='cleaning')addTask(r.id,'checkout','Guest checked out',null);
@@ -636,6 +678,7 @@ function moveGuest(bid,newId){
   nr.status='occupied';nr.bookingId=b.id;nr.lights=true;nr.presence=true;nr.vacantMin=0;nr.usage=0;nr.pw=[];nr.ac={mode:'cool',set:b.pref.temp||24};
   old.bookingId=null;old.ac={mode:'off',set:24};old.lights=false;old.presence=false;old.pw=[];
   if(S.tickets.some(t=>t.roomId===old.id&&t.status!=='resolved'))old.status='maintenance';else{old.status='cleaning';addTask(old.id,'checkout','Guest moved to Room '+nr.number,null)}
+  S.orders.filter(o=>o.bookingId===b.id&&ACTIVE.includes(o.status)).forEach(o=>{o.roomId=nr.id});
   b.roomId=nr.id;note('ok',b.name+' moved from Room '+old.number+' to Room '+nr.number);save();closeModal();render();toast('Moved to Room '+nr.number,'ok');
 }
 function extendDlg(bid){
@@ -650,18 +693,161 @@ function extendStay(bid,n){
   const nco=addDays(b.checkOut,n),q=quote(r,b.checkIn,nco,Object.assign({guests:b.guests},b.opts));
   b.checkOut=nco;b.quote=q;b.total=q.total;note('ok',b.name+' extended Room '+r.number+' to '+fdate(nco));save();closeModal();render();toast('Stay extended to '+fdate(nco),'ok');
 }
-function orderFood(bid){
-  const b=booking(bid);if(!b||b.status!=='checked-in')return;CART={};
-  openModal(`<h3>Room service</h3><p class="muted small">Charged to your room. Delivered in about 25 minutes.</p><div class="menu" style="margin-top:12px">${MENU.map((m,i)=>`<div class="mi"><div><b>${m[0]}</b><div class="small muted">${inr(m[1])}</div></div><div class="stepper"><button aria-label="Remove ${m[0]}" onclick="cartAdd(${i},-1)">−</button><output id="cq${i}" style="min-width:34px;font-size:18px">0</output><button aria-label="Add ${m[0]}" onclick="cartAdd(${i},1)">+</button></div></div>`).join('')}</div>
-   <div class="row between" style="margin-top:16px"><b>Total <span id="cartTot">₹0</span></b><button class="btn primary" onclick="placeOrder('${bid}')">Place order</button></div><div id="cartErr" style="margin-top:10px"></div>`);
+/* ===================== FOOD ORDERING CHAIN =====================
+   Guest orders -> Kitchen receives -> Chef cooks -> Ready -> Waiter delivers to the room -> Delivered */
+let CART={},MC='Breakfast',MV=false,CARTB=null,KT='all',PICK={};
+const fdur=ms=>ms<60000?Math.max(1,Math.round(ms/1000))+'s':ms<3600000?Math.round(ms/60000)+' min':(ms/3600000).toFixed(1)+' h';
+const clock=t=>new Date(t).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+function etaMins(items){
+  const mx=Math.max(...items.map(i=>menuItem(i.id)?menuItem(i.id).mins:10)),load=S.orders.filter(o=>o.status==='placed'||o.status==='preparing').length;
+  return mx+(items.length-1)*2+load*3+8;
 }
-let CART={};
-function cartAdd(i,d){CART[i]=clamp((CART[i]||0)+d,0,9);$('#cq'+i).textContent=CART[i];$('#cartTot').textContent=inr(sum(Object.keys(CART).map(k=>CART[k]*MENU[k][1])))}
+function createOrder(b,cart,notes){
+  const items=Object.keys(cart).filter(k=>cart[k]>0&&menuItem(k)).map(k=>{const m=menuItem(k);return{id:m.id,name:m.name,price:m.price,qty:cart[k]}});
+  const total=sum(items.map(i=>i.price*i.qty)),prep=Math.max(...items.map(i=>menuItem(i.id).mins));
+  const o={id:'O'+(S.oseq++),bookingId:b.id,roomId:b.roomId,guest:b.name,items,notes:notes||'',total,status:'placed',chef:'',waiter:'',eta:etaMins(items),prep,age:0,t:{placed:Date.now()}};
+  S.orders.push(o);b.extras.push({name:'Food order '+o.id,price:total,qty:1,orderId:o.id});return o;
+}
+function suggestStaff(list,kind){
+  const load=n=>S.orders.filter(o=>kind==='chef'?(o.chef===n&&o.status==='preparing'):(o.waiter===n&&o.status==='delivering')).length;
+  return list.slice().sort((x,y)=>load(x)-load(y))[0];
+}
+function orderFood(bid){
+  const b=booking(bid);
+  if(!b||b.status!=='checked-in')return toast('Food ordering is available once you have checked in','bad');
+  if(UI.role==='guest'&&UI.session!==bid)return toast('Please sign in to your stay first','bad');
+  if(!S.settings.kitchen)return toast('The kitchen is not taking orders right now. Please try again later.','bad');
+  if(S.orders.filter(o=>o.bookingId===bid&&ACTIVE.includes(o.status)).length>=3)return toast('You already have 3 orders in progress. Please wait for one to arrive.','bad');
+  CART={};MC='Breakfast';MV=false;CARTB=bid;
+  openModal(`<h3 style="font:600 30px var(--font-display)">Order food</h3><p class="muted small">Delivered to Room ${b.roomId}. Added to your room bill. Prices include taxes.</p>
+   <div class="row" style="margin:12px 0"><div class="seg" id="menuTabs" style="flex:1"></div><label class="switch"><input type="checkbox" onchange="menuVeg(this.checked)"><span></span><i class="veg v" style="margin:0"></i>Veg only</label></div>
+   <div id="menuList"></div><div class="field" style="margin-top:14px"><label for="ordNote">Special instructions (optional)</label><textarea id="ordNote" maxlength="200" placeholder="Less spicy, no onions, extra napkins…"></textarea></div>
+   <div id="cartErr"></div><div id="cartBar"></div>`,true);
+  drawMenu();
+}
+function menuCat(c){MC=c;drawMenu()}
+function menuVeg(v){MV=!!v;drawMenu()}
+function drawMenu(){
+  const tabs=$('#menuTabs'),list=$('#menuList');if(!tabs||!list)return;
+  tabs.innerHTML=FOOD_CATS.map(c=>`<button aria-pressed="${MC===c}" onclick="menuCat('${c}')">${c}</button>`).join('');
+  const items=MENU.filter(m=>m.cat===MC&&(!MV||m.veg));
+  list.innerHTML=`<div class="menu">${items.map(m=>`<div class="mi"><div><span class="veg ${m.veg?'v':'n'}" title="${m.veg?'Vegetarian':'Non-vegetarian'}"></span><b>${esc(m.name)}</b><div class="small muted">${inr(m.price)} · about ${m.mins} min</div></div>
+   <div class="stepper"><button aria-label="Remove one ${esc(m.name)}" onclick="cartAdd('${m.id}',-1)">−</button><output id="cq-${m.id}" style="min-width:34px;font-size:18px">${CART[m.id]||0}</output><button aria-label="Add one ${esc(m.name)}" onclick="cartAdd('${m.id}',1)">+</button></div></div>`).join('')||'<div class="empty">No vegetarian items in this category.</div>'}</div>`;
+  drawCartBar();
+}
+function drawCartBar(){
+  const el=$('#cartBar');if(!el)return;const n=sum(Object.values(CART)),tot=sum(Object.keys(CART).map(k=>CART[k]*menuItem(k).price));
+  el.innerHTML=`<div class="cartin"><div><b>${n} item${n===1?'':'s'}</b><div class="small muted">Total ${inr(tot)}</div></div><button class="btn gold" onclick="placeOrder('${CARTB}')">Place order</button></div>`;
+}
+function cartAdd(id,d){
+  if(!menuItem(id))return;const cur=CART[id]||0,nx=clamp(cur+d,0,9);
+  if(sum(Object.values(CART))-cur+nx>20){$('#cartErr').innerHTML='<div class="err" style="margin-top:10px">An order can have up to 20 items. Place this one first, then order again.</div>';return}
+  $('#cartErr').innerHTML='';if(nx)CART[id]=nx;else delete CART[id];
+  const q=$('#cq-'+id);if(q)q.textContent=nx;drawCartBar();
+}
 function placeOrder(bid){
-  const b=booking(bid),items=Object.keys(CART).filter(k=>CART[k]>0);
-  if(!items.length){$('#cartErr').innerHTML='<div class="err">Add at least one item to place an order.</div>';return}
-  items.forEach(k=>{const m=MENU[k],ex=b.extras.find(x=>x.name===m[0]);if(ex)ex.qty+=CART[k];else b.extras.push({name:m[0],price:m[1],qty:CART[k]})});
-  const txt=items.map(k=>CART[k]+'× '+MENU[k][0]).join(', ');addTask(b.roomId,'request','Room service: '+txt,null);note('warn','Room '+b.roomId+' ordered '+txt);save();closeModal();toast('Order placed. Arriving in about 25 minutes.','ok');render();
+  const b=booking(bid),err=m=>{$('#cartErr').innerHTML=`<div class="err" style="margin-top:10px">${m}</div>`};
+  if(!b||b.status!=='checked-in')return err('Food ordering is only available while you are checked in.');
+  if(UI.role==='guest'&&UI.session!==bid)return err('Please sign in to your stay first.');
+  if(!S.settings.kitchen)return err('The kitchen has just stopped taking orders. Please try again later.');
+  if(!Object.keys(CART).length)return err('Add at least one item to place an order.');
+  if(S.orders.filter(o=>o.bookingId===bid&&ACTIVE.includes(o.status)).length>=3)return err('You already have 3 orders in progress.');
+  const o=createOrder(b,CART,($('#ordNote').value||'').trim().slice(0,200));CART={};
+  note('warn','Room '+o.roomId+' placed food order '+o.id+' ('+sum(o.items.map(i=>i.qty))+' items, '+inr(o.total)+')');save();closeModal();
+  toast('Order '+o.id+' sent to the kitchen. Estimated by '+clock(o.t.placed+o.eta*60000),'ok');render();
+}
+/* stage machine: every step checks the order is in the right state, so double-clicks or two staff acting at once are safe */
+function setStage(o,st,msg){
+  o.status=st;o.age=0;o.t[st]=Date.now();delete PICK[o.id];
+  if(UI.role==='guest'&&UI.session===o.bookingId&&msg)toast(msg,st==='delivered'?'ok':'');
+}
+function orderAccept(id,auto){
+  const o=order(id);if(!o||o.status!=='placed')return toast('This order has already moved on','bad');
+  const chef=auto?suggestStaff(CHEFS,'chef'):(PICK[id]||suggestStaff(CHEFS,'chef'));
+  if(!CHEFS.includes(chef))return toast('Choose a chef first','bad');
+  o.chef=chef;setStage(o,'preparing',chef+' is preparing your food');note('info',chef+' started cooking order '+o.id+' for Room '+o.roomId);
+  if(!auto){save();render();toast(chef+' is cooking '+o.id,'ok')}
+}
+function orderReady(id,auto){
+  const o=order(id);if(!o||o.status!=='preparing')return toast('This order is not being cooked','bad');
+  setStage(o,'ready','Your food is ready and waiting for a waiter');note('info','Order '+o.id+' is ready for Room '+o.roomId+'. Waiter needed');
+  if(!auto){save();render();toast('Order '+o.id+' is ready for pickup','ok')}
+}
+function orderDispatch(id,auto){
+  const o=order(id);if(!o||o.status!=='ready')return toast('This order is not ready for pickup','bad');
+  const w=auto?suggestStaff(WAITERS,'waiter'):(PICK[id]||suggestStaff(WAITERS,'waiter'));
+  if(!WAITERS.includes(w))return toast('Choose a waiter first','bad');
+  o.waiter=w;setStage(o,'delivering',w+' is bringing your order to Room '+o.roomId);note('info',w+' is delivering order '+o.id+' to Room '+o.roomId);
+  if(!auto){save();render();toast(w+' is on the way to Room '+o.roomId,'ok')}
+}
+function orderDeliver(id,auto){
+  const o=order(id);if(!o||o.status!=='delivering')return toast('This order is not out for delivery','bad');
+  setStage(o,'delivered','Your order '+o.id+' has been delivered. Enjoy your meal!');note('ok','Order '+o.id+' delivered to Room '+o.roomId+' by '+o.waiter);
+  if(!auto){save();render();toast('Order '+o.id+' delivered','ok')}
+}
+function askCancelOrder(id){
+  const o=order(id);if(!o)return;
+  if(!['placed','preparing','ready'].includes(o.status))return toast(o.status==='delivering'?'The order is already on its way and cannot be cancelled':'This order can no longer be cancelled','bad');
+  if(UI.role==='guest'&&o.status!=='placed')return toast('The kitchen has started this order. Please ask staff to cancel it.','bad');
+  ask('Cancel order '+o.id+'?','The charge of '+inr(o.total)+' will be removed from the room bill.',()=>orderCancel(id),'Cancel order',true);
+}
+function orderCancel(id,reason){
+  const o=order(id);if(!o||!['placed','preparing','ready'].includes(o.status))return toast('This order can no longer be cancelled','bad');
+  o.status='cancelled';o.cancelReason=reason||(UI.role==='guest'?'Cancelled by guest':'Cancelled by staff');o.t.cancelled=Date.now();
+  const b=booking(o.bookingId);if(b)b.extras=b.extras.filter(x=>x.orderId!==o.id);
+  note('warn','Order '+o.id+' for Room '+o.roomId+' was cancelled');save();render();toast('Order '+o.id+' cancelled');
+}
+function pickStaff(id,v){PICK[id]=v}
+function setKitchen(on){S.settings.kitchen=!!on;note(on?'ok':'warn','Kitchen is now '+(on?'accepting':'not accepting')+' orders');save();toast('Kitchen '+(on?'open':'closed'),on?'ok':'');render()}
+function setFoodAuto(on){S.settings.foodAuto=!!on;save();toast('Demo auto-progress '+(on?'on: orders move through the kitchen automatically':'off: staff move orders manually'));render()}
+/* demo mode: simulated kitchen and waiters advance orders on every sensor tick */
+function foodTick(){
+  if(!S.settings.foodAuto)return;
+  for(const o of S.orders){
+    const th={placed:2,preparing:clamp(Math.round((o.prep||10)/4),3,6),ready:2,delivering:3}[o.status];if(!th)continue;
+    o.age=(o.age||0)+1;if(o.age<th)continue;
+    if(o.status==='placed')orderAccept(o.id,true);else if(o.status==='preparing')orderReady(o.id,true);else if(o.status==='ready')orderDispatch(o.id,true);else orderDeliver(o.id,true);
+  }
+}
+/* guest tracker */
+function orderTrack(o){
+  const steps=['placed','preparing','ready','delivering','delivered'],labels=['Received','Cooking','Ready','On the way','Delivered'],idx=steps.indexOf(o.status);
+  const who={placed:'Your order has been sent to the kitchen.',preparing:esc(o.chef)+' is preparing your food.',ready:'Your food is ready. A waiter is about to pick it up.',delivering:esc(o.waiter)+' is bringing your order to Room '+o.roomId+'.',
+    delivered:'Delivered at '+clock(o.t.delivered||Date.now())+'. Enjoy your meal!',cancelled:'This order was cancelled'+(o.cancelReason?' ('+esc(o.cancelReason)+')':'')+'.'}[o.status];
+  return `<div class="otrack"><div class="row between"><b>Order ${o.id}</b>${chip(ORD[o.status][0],ORD[o.status][1])}</div>
+   <div class="small muted">${o.items.map(i=>i.qty+'× '+esc(i.name)).join(', ')} · ${inr(o.total)}</div>
+   ${o.status==='cancelled'?'':`<ol class="track">${steps.map((st,i)=>`<li class="${o.status==='delivered'||i<idx?'done':i===idx?'now':''}"><i></i><span>${labels[i]}</span></li>`).join('')}</ol>`}
+   <p class="small" style="margin-top:6px">${who}${ACTIVE.includes(o.status)?' <span class="muted">Estimated by '+clock(o.t.placed+o.eta*60000)+'</span>':''}</p>
+   ${o.status==='placed'?`<button class="btn sm" style="margin-top:6px" onclick="askCancelOrder('${o.id}')">Cancel order</button>`:''}</div>`;
+}
+/* staff kitchen console */
+function ordCard(o){
+  const el=Date.now()-o.t.placed,late=ACTIVE.includes(o.status)&&el>25*60000;
+  const sel=(list,sug)=>`<select aria-label="Assign staff" onchange="pickStaff('${o.id}',this.value)">${list.map(n=>`<option ${(PICK[o.id]||sug)===n?'selected':''}>${n}</option>`).join('')}</select>`;
+  let act='';
+  if(o.status==='placed'){const sug=suggestStaff(CHEFS,'chef');act=`<div class="field"><label>Assign a chef <span class="muted">· AI suggests ${sug}</span></label>${sel(CHEFS,sug)}</div><div class="row"><button class="btn sm primary" onclick="orderAccept('${o.id}')">Accept and cook</button><button class="btn sm" onclick="askCancelOrder('${o.id}')">Cancel</button></div>`}
+  else if(o.status==='preparing')act=`<div class="small">${ico('cup',15)} Cooking: <b>${esc(o.chef)}</b></div><div class="row"><button class="btn sm primary" onclick="orderReady('${o.id}')">${ico('check',16)} Mark ready</button><button class="btn sm" onclick="askCancelOrder('${o.id}')">Cancel</button></div>`;
+  else if(o.status==='ready'){const sug=suggestStaff(WAITERS,'waiter');act=`<div class="small">Cooked by <b>${esc(o.chef)}</b></div><div class="field"><label>Assign a waiter <span class="muted">· AI suggests ${sug}</span></label>${sel(WAITERS,sug)}</div><div class="row"><button class="btn sm primary" onclick="orderDispatch('${o.id}')">Send for delivery</button><button class="btn sm" onclick="askCancelOrder('${o.id}')">Cancel</button></div>`}
+  else if(o.status==='delivering')act=`<div class="small">Waiter: <b>${esc(o.waiter)}</b> → Room ${o.roomId}</div><div class="row"><button class="btn sm primary" onclick="orderDeliver('${o.id}')">${ico('check',16)} Mark delivered</button></div>`;
+  return `<div class="ord ${late?'late':''}"><div class="row between"><b style="font:700 24px var(--font-display)">Room ${o.roomId}</b><span class="small muted">${o.id}</span></div>
+   <div class="small muted">${esc(o.guest)} · placed ${fdur(el)} ago ${late?chip('bad','Delayed'):''}</div>
+   <ul class="olist">${o.items.map(i=>`<li><span>${i.qty}× ${esc(i.name)}</span><span class="muted">${inr(i.price*i.qty)}</span></li>`).join('')}</ul>${o.notes?`<div class="note small"><b>Note:</b> ${esc(o.notes)}</div>`:''}${act}</div>`;
+}
+function kitchenView(){
+  const by=st=>S.orders.filter(o=>o.status===st).sort((a,b)=>a.t.placed-b.t.placed);
+  const done=by('delivered').sort((a,b)=>b.t.delivered-a.t.delivered),canc=S.orders.filter(o=>o.status==='cancelled').length;
+  const avgT=done.length?avg(done.map(o=>o.t.delivered-o.t.placed)):0;
+  const allCols=[['placed','New orders'],['preparing','In the kitchen'],['ready','Ready for a waiter'],['delivering','On the way']];
+  const cols=KT==='chef'?allCols.slice(0,2):KT==='waiter'?allCols.slice(2):allCols;
+  const load=(list,kind)=>list.map(n=>{const c=S.orders.filter(o=>kind==='chef'?(o.chef===n&&o.status==='preparing'):(o.waiter===n&&o.status==='delivering')).length;return `<div style="margin-bottom:10px"><div class="row between small"><b>${esc(n)}</b><span class="muted">${c} active</span></div><div class="bar ${c>1?'hot':''}"><i style="width:${Math.min(100,c*50)}%"></i></div></div>`}).join('');
+  return `<div class="page-head"><div><h2>Kitchen and room service</h2><p>Orders flow from the guest to a chef, then to a waiter who delivers to the room.</p></div></div>
+  <div class="card flat" style="margin-bottom:16px"><div class="row between"><div class="row"><label class="switch"><input type="checkbox" ${S.settings.kitchen?'checked':''} onchange="setKitchen(this.checked)"><span></span>Kitchen accepting orders</label>
+   <label class="switch"><input type="checkbox" ${S.settings.foodAuto?'checked':''} onchange="setFoodAuto(this.checked)"><span></span>Demo auto-progress</label></div>
+   <div class="seg" role="group" aria-label="Station">${[['all','All stations'],['chef','Chef station'],['waiter','Waiter station']].map(x=>`<button aria-pressed="${KT===x[0]}" onclick="KT='${x[0]}';render()">${x[1]}</button>`).join('')}</div></div></div>
+  <div class="grid g-kpi" style="margin-bottom:16px">${kpi('lamp','cup',by('placed').length+by('preparing').length,'Waiting or cooking')}${kpi('clean','bed',by('ready').length+by('delivering').length,'Ready or on the way')}${kpi('ok','check',done.length,'Delivered')}${kpi('','clock',done.length?fdur(avgT):'–','Average delivery time')}${kpi(canc?'bad':'ok','x',canc,'Cancelled')}</div>
+  <div class="kcols">${cols.map(([st,label])=>{const l=by(st);return `<div class="kcol"><h3>${label} ${chip(ORD[st][0],l.length)}</h3>${l.length?l.map(ordCard).join(''):'<div class="empty" style="padding:18px 6px">Nothing here</div>'}</div>`}).join('')}</div>
+  <div class="grid g-2" style="margin-top:16px"><div class="card"><h3>Team workload</h3><p class="muted small" style="margin-bottom:12px">AI suggests the least busy person for every new order.</p><div class="grid g-2"><div><h4 style="margin-bottom:10px">Chefs</h4>${load(CHEFS,'chef')}</div><div><h4 style="margin-bottom:10px">Waiters</h4>${load(WAITERS,'waiter')}</div></div></div>
+   <div class="card"><h3>Recently delivered</h3>${done.slice(0,6).map(o=>`<div class="item"><div class="main"><b>Room ${o.roomId}</b> <span class="small muted">${o.id}</span><div class="small muted">${o.items.map(i=>i.qty+'× '+esc(i.name)).join(', ')}</div><div class="small">Cooked by ${esc(o.chef)} · delivered by ${esc(o.waiter)}</div></div><span class="small muted nowrap">${fdur(o.t.delivered-o.t.placed)}</span></div>`).join('')||'<div class="empty">No deliveries yet</div>'}</div></div>`;
 }
 function submitFeedback(bid,stars){
   const b=booking(bid),txt=$('#fbTxt')?$('#fbTxt').value.trim():'';
@@ -669,17 +855,38 @@ function submitFeedback(bid,stars){
   b.rating=stars;S.reviews.unshift({id:'R'+Date.now(),name:b.name.split(' ')[0]+' '+(b.name.split(' ')[1]||' ')[0]+'.',stars,text:txt||'Great stay.',t:Date.now()});save();render();toast('Thank you for your feedback','ok');
 }
 let FB=0;function setStars(n){FB=n;document.querySelectorAll('.stars-in button').forEach((el,i)=>el.classList.toggle('on',i<n))}
+/* ===== itemised bill: room charges + food and drinks order by order ===== */
+function billParts(b,preview){
+  const orders=S.orders.filter(o=>o.bookingId===b.id&&(preview?o.status==='delivered':o.status!=='cancelled')).sort((x,y)=>x.t.placed-y.t.placed);
+  const other=(b.extras||[]).filter(x=>!x.orderId),food=sum(orders.map(o=>o.total)),oth=sum(other.map(x=>x.price*x.qty));
+  return{q:b.quote,orders,other,food,oth,total:b.total+food+oth};
+}
+function billHTML(b,preview){
+  const p=billParts(b,preview),q=p.q,L=(a,v,c)=>`<div class="qline ${c||''}"><span>${a}</span><span>${v}</span></div>`;
+  let h=`<div class="bsec">Room charges</div>`+L(q.n+' night'+(q.n>1?'s':''),inr(q.base))+q.add.map(x=>L(esc(x[0]),inr(x[1]))).join('')+(q.disc?L('Promo '+esc(q.promo),'−'+inr(q.disc)):'')+L('GST '+q.gstPct+'%',inr(q.gst))+L('Room total',inr(b.total),'sub');
+  h+=`<div class="bsec">Food and drinks <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">(prices include taxes)</span></div>`;
+  if(p.orders.length||p.other.length){
+    p.orders.forEach(o=>{h+=`<div class="qline"><span><b>Order ${o.id}</b> <span class="muted small">${clock(o.t.placed)}${o.status!=='delivered'?' · '+ORD[o.status][1]:''}</span></span><span>${inr(o.total)}</span></div>`+o.items.map(i=>`<div class="qline qi"><span>${i.qty}× ${esc(i.name)}</span><span>${inr(i.price*i.qty)}</span></div>`).join('')});
+    p.other.forEach(x=>{h+=L(x.qty+'× '+esc(x.name),inr(x.price*x.qty))});
+    h+=L('Food and drinks total',inr(p.food+p.oth),'sub');
+  }else h+=`<div class="small muted" style="padding:4px 0 2px">No food orders.</div>`;
+  return h+L(preview?'Total to pay at check-out':'Total','<b>'+inr(p.total)+'</b>','tot');
+}
 function receiptText(b){
-  const r=room(b.roomId),q=b.quote,L=[];
-  L.push('SmartStay AI – Receipt','Booking '+b.id,'Guest: '+b.name,'Room '+r.number+' ('+r.type+')','Stay: '+b.checkIn+' to '+b.checkOut+' ('+q.n+' nights)','');
-  L.push('Room charges: '+inr(q.base));q.add.forEach(a=>L.push(a[0]+': '+inr(a[1])));if(q.disc)L.push('Promo '+q.promo+': -'+inr(q.disc));
-  L.push('GST '+q.gstPct+'%: '+inr(q.gst));(b.extras||[]).forEach(x=>L.push(x.qty+'× '+x.name+': '+inr(x.price*x.qty)));L.push('','TOTAL: '+inr(billTotal(b)));return L.join('\n');
+  const r=room(b.roomId),p=billParts(b,false),q=p.q,L=[];
+  L.push('SmartStay AI – Receipt','Booking '+b.id,'Guest: '+b.name,'Room '+r.number+' ('+r.type+')','Stay: '+b.checkIn+' to '+b.checkOut+' ('+q.n+' nights)','','ROOM CHARGES');
+  L.push('  '+q.n+' night(s): '+inr(q.base));q.add.forEach(a=>L.push('  '+a[0]+': '+inr(a[1])));if(q.disc)L.push('  Promo '+q.promo+': -'+inr(q.disc));
+  L.push('  GST '+q.gstPct+'%: '+inr(q.gst),'  Room total: '+inr(b.total),'','FOOD AND DRINKS (prices include taxes)');
+  if(p.orders.length||p.other.length){
+    p.orders.forEach(o=>{L.push('  Order '+o.id+' ('+clock(o.t.placed)+'): '+inr(o.total));o.items.forEach(i=>L.push('    '+i.qty+'x '+i.name+': '+inr(i.price*i.qty)))});
+    p.other.forEach(x=>L.push('  '+x.qty+'x '+x.name+': '+inr(x.price*x.qty)));L.push('  Food and drinks total: '+inr(p.food+p.oth));
+  }else L.push('  No food orders.');
+  L.push('','TOTAL: '+inr(p.total));return L.join('\n');
 }
 function showBill(b){
-  if(!b)return;const r=room(b.roomId),q=b.quote,L=(a,v,c)=>`<div class="qline ${c||''}"><span>${a}</span><span>${v}</span></div>`;
+  if(!b)return;const r=room(b.roomId);
   openModal(`<h3>Receipt · ${esc(b.id)}</h3><p class="muted small">${esc(b.name)} · Room ${r.number} (${r.type}) · ${fdate(b.checkIn)} – ${fdate(b.checkOut)}</p>
-   <div style="margin-top:12px">${L(q.n+' night'+(q.n>1?'s':''),inr(q.base))}${q.add.map(a=>L(esc(a[0]),inr(a[1]))).join('')}${q.disc?L('Promo '+esc(q.promo),'−'+inr(q.disc)):''}${L('GST '+q.gstPct+'%',inr(q.gst))}
-   ${(b.extras||[]).map(x=>L(x.qty+'× '+esc(x.name),inr(x.price*x.qty))).join('')}${L('Total','<b>'+inr(billTotal(b))+'</b>','tot')}</div>
+   <div style="margin-top:6px">${billHTML(b,false)}</div>
    <div class="row end"><button class="btn" onclick="exportText('receipt-${b.id}.txt',receiptText(booking('${b.id}')))">${ico('download')} Download</button><button class="btn primary" onclick="closeModal()">Done</button></div>`);
 }
 
@@ -724,7 +931,7 @@ function tick(silent){
   S.energy.kwh+=tot*dt/60;S.energy.saved+=Math.max(0,base-tot)*dt/60;S.energy.load=tot;
   S.energy.series.push({a:+tot.toFixed(2),b:+base.toFixed(2)});if(S.energy.series.length>36)S.energy.series.shift();
   predictHK(silent);
-  if(!silent){save();refreshLive()}
+  if(!silent){foodTick();save();refreshLive()}
 }
 let simTimer=null;
 function startSim(){clearInterval(simTimer);if(S.settings.running)simTimer=setInterval(()=>{if(document.hidden)return;try{tick()}catch(e){reportError(e,'sensor update')}},2500/S.settings.speed)}
@@ -766,7 +973,7 @@ window.addEventListener('scroll',syncScrolled,{passive:true});
 /* =====================  SHELL / NAV  ===================== */
 const NAV={
  guest:[['home','Home','home','Home'],['book','Book a room','plus','Book'],['stay','My stay','key','My stay'],['chat','AI assistant','chat','Assistant']],
- staff:[['dashboard','Dashboard','grid','Home'],['rooms','Rooms','bed','Rooms'],['bookings','Bookings','calendar','Bookings'],['calendar','Calendar','calendar','Calendar'],['guests','Guests','users','Guests'],['housekeeping','Housekeeping','sparkles','Cleaning'],
+ staff:[['dashboard','Dashboard','grid','Home'],['rooms','Rooms','bed','Rooms'],['bookings','Bookings','calendar','Bookings'],['calendar','Calendar','calendar','Calendar'],['guests','Guests','users','Guests'],['housekeeping','Housekeeping','sparkles','Cleaning'],['kitchen','Kitchen','cup','Kitchen'],
         ['energy','Energy & IoT','bolt','Energy'],['maintenance','Maintenance','wrench','Repairs'],['insights','AI insights','chart','Insights'],['reports','Reports','trend','Reports'],['book','New booking','plus','New'],['chat','AI assistant','chat','Assistant'],['settings','Settings','sliders','Settings']]
 };
 const BOTTOM={guest:['home','book','stay','chat'],staff:['dashboard','rooms','bookings','housekeeping']};
@@ -822,12 +1029,12 @@ function staffShell(body){
    <main id="main">${body}</main></div>${bottomNav()}</div>`;
 }
 let LASTSIG='';
-function sigOf(){return S.tasks.map(t=>t.id+t.status).join()+S.tickets.map(t=>t.id+t.status).join()}
+function sigOf(){return S.tasks.map(t=>t.id+t.status).join()+S.tickets.map(t=>t.id+t.status).join()+S.orders.map(o=>o.id+o.status).join()+Math.floor(Date.now()/60000)}
 function refreshLive(){
   const b=$('#bellBadge');if(b){const u=unread();b.textContent=u;b.hidden=!u}
   const v=UI.view;
   if(v==='dashboard')softRender();
-  else if(v==='housekeeping'||v==='maintenance'){const s=sigOf();if(s!==LASTSIG){LASTSIG=s;softRender()}}
+  else if(v==='housekeeping'||v==='maintenance'||v==='kitchen'){const s=sigOf();if(s!==LASTSIG){LASTSIG=s;softRender()}}
   else if(v==='rooms')drawRooms();else if(v==='energy')drawEnergy();else if(v==='stay')drawStayLive();
   if(OPENROOM)updateRoomLive();
 }
@@ -889,8 +1096,8 @@ function copyTxt(){
 }
 function csvCell(v){v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
 function exportBookings(){
-  const rows=[['Booking ID','Guest','Phone','Email','Room','Check-in','Check-out','Guests','Status','Total (INR)']];
-  S.bookings.forEach(b=>rows.push([b.id,b.name,b.phone,b.email,b.roomId,b.checkIn,b.checkOut,b.guests,b.status,billTotal(b)]));
+  const rows=[['Booking ID','Guest','Phone','Email','Room','Check-in','Check-out','Guests','Status','Room total (INR)','Food and drinks (INR)','Grand total (INR)']];
+  S.bookings.forEach(b=>rows.push([b.id,b.name,b.phone,b.email,b.roomId,b.checkIn,b.checkOut,b.guests,b.status,b.total,foodSum(b),billTotal(b)]));
   exportText('smartstay-bookings.csv',rows.map(r=>r.map(csvCell).join(',')).join('\n'));
 }
 function exportBackup(){exportText('smartstay-backup.json',JSON.stringify(S))}
@@ -902,7 +1109,7 @@ function restoreNow(){
   const txt=$('#rsTxt').value.trim(),box=$('#rsErr');if(!txt){box.innerHTML='<div class="err">Paste the backup text first.</div>';return}
   let d;try{d=JSON.parse(txt)}catch(e){box.innerHTML='<div class="err">That is not valid JSON. Copy the whole backup text and try again.</div>';return}
   if(!validData(d)){box.innerHTML='<div class="err">This backup is incomplete or from a different version, so it was not restored. Your current data is unchanged.</div>';return}
-  S=d;UI.session=null;save();uiSave();startSim();closeModal();render();toast('Backup restored','ok');
+  normalize(d);S=d;UI.session=null;save();uiSave();startSim();closeModal();render();toast('Backup restored','ok');
 }
 function resetData(){ask('Reset demo data?','This restores the original rooms, bookings and sensor data. Anything you added will be removed.',()=>{UI.session=null;uiSave();seed();startSim();render();toast('Demo data restored','ok')},'Reset',true)}
 
@@ -962,6 +1169,7 @@ const stars=n=>'★★★★★'.slice(0,Math.round(n))+'<span style="opacity:.3
 
 /* =====================  VIEWS  ===================== */
 const VIEWS={};
+VIEWS.kitchen=kitchenView;
 function facade(){
   let h='';for(let f=4;f>=1;f--){h+=`<div class="fl"><em>${f}</em>`;S.rooms.filter(r=>r.floor===f).forEach(r=>{h+=`<i class="w ${r.status} ${r.status==='occupied'&&!r.presence?'away':''}" title="Room ${r.number}: ${STATUS[r.status][1]}"></i>`});h+='</div>'}
   return `<div class="facade" role="img" aria-label="Live hotel facade, each window is a room"><h3>The hotel, live</h3><div class="sub">Every window is a real room. Lit means a guest is in.</div>${h}<div class="ground"></div>
@@ -1022,7 +1230,7 @@ VIEWS.dashboard=()=>{
   const seg=(k,col)=>`<i style="flex:${c[k]||.001};background:${col}" title="${STATUS[k][1]}: ${c[k]}"></i>`;const feed=S.alerts.slice(0,8);
   return `<div class="page-head"><div><h2>${hr<12?'Good morning':hr<17?'Good afternoon':'Good evening'}</h2><p>${new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})} · here is how the hotel is doing right now.</p></div><button class="btn primary" onclick="go('book')">${ico('plus')} New booking</button></div>
   <div class="grid g-kpi">${kpi('lamp','bed',occPct+'%','Occupancy ('+c.occupied+' of '+S.rooms.length+' rooms)')}${kpi('ok','key',c.available,'Rooms ready to sell')}
-   ${kpi('clean','sparkles',hk,'Cleaning tasks open')}${kpi(mt?'bad':'ok','wrench',mt,'Open maintenance tickets')}${kpi('ok','leaf',Math.round(S.energy.saved)+' kWh','Saved by AI today')}${kpi('','star',avgRating().toFixed(1),'Guest rating ('+S.reviews.length+' reviews)')}</div>
+   ${kpi('clean','sparkles',hk,'Cleaning tasks open')}${kpi('lamp','cup',S.orders.filter(o=>ACTIVE.includes(o.status)).length,'Food orders in progress')}${kpi(mt?'bad':'ok','wrench',mt,'Open maintenance tickets')}${kpi('ok','leaf',Math.round(S.energy.saved)+' kWh','Saved by AI today')}${kpi('','star',avgRating().toFixed(1),'Guest rating ('+S.reviews.length+' reviews)')}</div>
   <div class="grid g-2" style="margin-top:16px"><div class="card"><h3>Room status</h3><div class="statusbar">${seg('available','var(--ok)')}${seg('occupied','var(--lamp)')}${seg('cleaning','var(--clean)')}${seg('maintenance','var(--bad)')}</div>
    <div class="legend"><span><b style="background:var(--ok)"></b>Available ${c.available}</span><span><b style="background:var(--lamp)"></b>Occupied ${c.occupied}</span><span><b style="background:var(--clean)"></b>Cleaning ${c.cleaning}</span><span><b style="background:var(--bad)"></b>Maintenance ${c.maintenance}</span></div>
    <h3 style="margin-top:20px">Occupancy by floor</h3>${barChart(floors,{max:100,unit:'%',labels:true,h:170,label:'Occupancy by floor'})}</div>
@@ -1032,7 +1240,14 @@ VIEWS.dashboard=()=>{
   <div class="grid g-2" style="margin-top:16px"><div class="card"><h3>Arriving today (${arr.length})</h3>${arr.length?arr.map(b=>`<div class="item"><div class="main"><b>${esc(b.name)}</b><div class="small muted">Room ${b.roomId} · ${b.guests} guest${b.guests>1?'s':''}</div></div><button class="btn sm primary" onclick="checkInBooking('${b.id}')">Check in</button></div>`).join(''):'<div class="empty">No more arrivals today</div>'}</div>
    <div class="card"><h3>Departing today (${dep.length})</h3>${dep.length?dep.map(b=>`<div class="item"><div class="main"><b>${esc(b.name)}</b><div class="small muted">Room ${b.roomId}</div></div><button class="btn sm" onclick="askOut('${b.id}')">Check out</button></div>`).join(''):'<div class="empty">No departures pending</div>'}</div></div>`;
 };
-function askOut(id){const b=booking(id);if(!b)return;ask('Check out '+esc(b.name)+'?','Room '+b.roomId+' will be marked for cleaning and the receipt will be shown.',()=>checkOutBooking(id),'Check out')}
+function askOut(id){
+  const b=booking(id);if(!b||b.status!=='checked-in')return toast('This guest is not checked in','bad');
+  const act=S.orders.filter(o=>o.bookingId===id&&ACTIVE.includes(o.status)),p=billParts(b,true);
+  openModal(`<h3 style="font:600 30px var(--font-display)">Check out ${esc(b.name)}?</h3><p class="muted small">Room ${b.roomId} will be marked for cleaning. Please review the bill below.</p>
+   <div style="margin-top:6px">${billHTML(b,true)}</div>
+   ${act.length?`<div class="note" style="margin-top:12px"><b>${act.length} food order${act.length>1?'s are':' is'} still in progress</b> (${act.map(o=>o.id).join(', ')}). ${act.length>1?'They':'It'} will be cancelled and <b>not charged</b>.</div>`:''}
+   <div class="row end"><button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="checkOutBooking('${id}')">Confirm check-out · ${inr(p.total)}</button></div>`,true);
+}
 
 /* ---- rooms ---- */
 let RF={floor:'All',type:'All',status:'All',q:''};
@@ -1069,11 +1284,11 @@ function openRoom(id){
    <p class="small muted" style="margin:12px 0">${r.beds} · up to ${r.cap} guests · ${inr(r.price)}/night · last cleaned ${ago(r.lastCleaned)}</p>`;
   if(tk.length)body+=`<div class="err" style="margin-bottom:12px">Open issue: ${esc(tk[0].title)}</div>`;
   if(r.status==='occupied'&&b){
-    body+=`<div class="note" style="margin-bottom:14px"><b>${esc(b.name)}</b> · ${b.guests} guest${b.guests>1?'s':''} · ${fdate(b.checkIn)} – ${fdate(b.checkOut)} · prefers ${b.pref.temp}°C</div>
+    body+=`<div class="note" style="margin-bottom:14px"><b>${esc(b.name)}</b> · ${b.guests} guest${b.guests>1?'s':''} · ${fdate(b.checkIn)} – ${fdate(b.checkOut)} · prefers ${b.pref.temp}°C · <b>Bill so far ${inr(billTotal(b))}</b>${foodSum(b)?' (food '+inr(foodSum(b))+')':''}</div>
     <div class="row" style="margin-bottom:12px"><span class="lbl">AC mode</span><div class="seg2">${['off','eco','cool'].map(m=>`<button aria-pressed="${r.ac.mode===m}" onclick="acMode(${id},'${m}')">${m[0].toUpperCase()+m.slice(1)}</button>`).join('')}</div></div>
     <div class="row" style="margin-bottom:12px"><span class="lbl">Set point</span><div class="stepper"><button aria-label="Lower" onclick="acStep(${id},-1)">−</button><output>${r.ac.set}°C</output><button aria-label="Raise" onclick="acStep(${id},1)">+</button></div>
     <button class="btn" onclick="toggleLights(${id})">${ico('sun')} Lights ${r.lights?'off':'on'}</button></div>
-    <div class="row end"><button class="btn" onclick="openReport(${id})">Report issue</button><button class="btn" onclick="openMove('${b.id}')">${ico('swap')} Change room</button><button class="btn danger" onclick="askOut('${b.id}')">Check out</button></div>`;
+    <div class="row end"><button class="btn" onclick="openReport(${id})">Report issue</button><button class="btn" onclick="orderFood('${b.id}')">${ico('cup')} Food order</button><button class="btn" onclick="openMove('${b.id}')">${ico('swap')} Change room</button><button class="btn danger" onclick="askOut('${b.id}')">Check out</button></div>`;
   }else if(r.status==='cleaning'){
     body+=`<div class="row end"><button class="btn" onclick="openReport(${id})">Report issue</button>${hk?`<button class="btn primary" onclick="completeTask('${hk.id}')">Mark as cleaned</button>`:''}</div>`;
   }else if(r.status==='available'){
@@ -1188,7 +1403,7 @@ function bookingRow(b){
   const ch={booked:['info','Upcoming'],'checked-in':['occ','In house'],'checked-out':['ok','Checked out'],cancelled:['neutral','Cancelled']}[b.status]||['neutral',b.status];
   const act=b.status==='booked'?`<button class="btn sm primary" onclick="checkInBooking('${b.id}')">Check in</button><button class="btn sm" onclick="ask('Cancel booking ${b.id}?','The room will be released for other guests.',()=>cancelBooking('${b.id}'),'Cancel booking',true)">Cancel</button>`
    :b.status==='checked-in'?`<button class="btn sm" onclick="extendDlg('${b.id}')">Extend</button><button class="btn sm" onclick="openMove('${b.id}')">Change room</button><button class="btn sm" onclick="askOut('${b.id}')">Check out</button>`:b.status==='checked-out'?`<button class="btn sm" onclick="showBill(booking('${b.id}'))">Receipt</button>`:'';
-  return `<div class="item"><div class="main"><b>${esc(b.name)}</b> ${chip(ch[0],ch[1])}<div class="small muted">${b.id} · Room ${b.roomId} · ${fdate(b.checkIn)} – ${fdate(b.checkOut)} · ${b.guests} guest${b.guests>1?'s':''} · ${inr(billTotal(b))}</div>${b.requests?`<div class="small">Request: ${esc(b.requests)}</div>`:''}</div><div class="row">${act}</div></div>`;
+  return `<div class="item"><div class="main"><b>${esc(b.name)}</b> ${chip(ch[0],ch[1])}<div class="small muted">${b.id} · Room ${b.roomId} · ${fdate(b.checkIn)} – ${fdate(b.checkOut)} · ${b.guests} guest${b.guests>1?'s':''} · ${inr(billTotal(b))}${foodSum(b)?' <span class="chip neutral">incl. food '+inr(foodSum(b))+'</span>':''}</div>${b.requests?`<div class="small">Request: ${esc(b.requests)}</div>`:''}</div><div class="row">${act}</div></div>`;
 }
 function drawBookings(){
   const el=$('#bkList');if(!el)return;const q=BF.q.toLowerCase().trim();
@@ -1239,20 +1454,21 @@ VIEWS.stay=()=>{
   let h=`<div class="page-head"><div><h2 class="display">Hello, ${esc(b.name.split(' ')[0])}</h2><p>Booking ${b.id}${gs?' · '+(gs.tier==='Member'?'Member':gs.tier+' member')+' · '+gs.points+' points':''}</p></div><button class="btn ghost" onclick="UI.session=null;uiSave();render()">Not you? Sign out</button></div>
   <div class="grid g-2"><div class="card"><div class="row between"><h3 style="margin:0">Your stay</h3>${chip(ch[0],ch[1])}</div>
    <div class="stack" style="margin-top:14px"><div class="row between"><span class="muted">Room</span><b>${r.number} · ${r.type}, ${r.view} view</b></div><div class="row between"><span class="muted">Dates</span><b>${fdate(b.checkIn)} – ${fdate(b.checkOut)} (${nightsBetween(b.checkIn,b.checkOut)} nights)</b></div>
-   <div class="row between"><span class="muted">Guests</span><b>${b.guests}</b></div><div class="row between"><span class="muted">Total incl. GST</span><b>${inr(billTotal(b))}</b></div>${b.requests?`<div class="row between"><span class="muted">Your request</span><b style="text-align:right">${esc(b.requests)}</b></div>`:''}</div>`;
+   <div class="row between"><span class="muted">Guests</span><b>${b.guests}</b></div><div class="row between"><span class="muted">${b.status==='checked-in'?'Bill so far':'Total incl. GST'}</span><b id="stayTotal">${inr(billTotal(b))}</b></div>${b.requests?`<div class="row between"><span class="muted">Your request</span><b style="text-align:right">${esc(b.requests)}</b></div>`:''}</div>`;
   if(b.status==='booked'){
     const ready=b.checkIn<=today();
     h+=`<div class="row" style="margin-top:18px">${ready?`<button class="btn gold lg" onclick="checkInBooking('${b.id}')">${ico('key')} Smart check-in</button>`:`<span class="note">Check-in opens on ${fdate(b.checkIn)} from 2:00 PM.</span>`}
     <button class="btn" onclick="ask('Cancel this booking?','Free cancellation. Your room will be released.',()=>cancelBooking('${b.id}'),'Cancel booking',true)">Cancel booking</button></div></div>
     <div class="card"><h3>Your comfort preference</h3><p class="muted">On check-in we cool your room to <b>${b.pref.temp}°C</b> so it is ready when you arrive.</p><div class="row" style="margin-top:14px"><button class="btn" onclick="showBill(booking('${b.id}'))">${ico('file')} View receipt</button></div></div></div>`;
   }else if(b.status==='checked-in'){
-    h+=`<div class="row" style="margin-top:18px"><button class="btn gold" onclick="openKey('${b.id}')">${ico('key')} Digital key</button><button class="btn" onclick="extendDlg('${b.id}')">Extend stay</button><button class="btn danger" onclick="askOut('${b.id}')">Check out</button></div></div>
+    h+=`<div class="row" style="margin-top:18px"><button class="btn gold" onclick="orderFood('${b.id}')">${ico('cup',18)} Order food</button><button class="btn" onclick="openKey('${b.id}')">${ico('key')} Digital key</button><button class="btn" onclick="extendDlg('${b.id}')">Extend stay</button><button class="btn danger" onclick="askOut('${b.id}')">Check out</button></div></div>
     <div class="card"><h3>Your room right now</h3><div id="stayLive"></div></div></div>
     <div class="grid g-2" style="margin-top:16px"><div class="card"><h3>Room controls</h3><div id="stayCtl"></div></div>
     <div class="card"><h3>Need something?</h3><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
-     ${['Extra towels','Room cleaning','Late check-out'].map(x=>`<button class="btn" onclick="guestReq('${x}')">${x}</button>`).join('')}<button class="btn" onclick="orderFood('${b.id}')">${ico('cup',18)} Room service</button><button class="btn" onclick="openReport(${r.id},true)">Report a problem</button></div>
+     ${['Extra towels','Room cleaning','Late check-out'].map(x=>`<button class="btn" onclick="guestReq('${x}')">${x}</button>`).join('')}<button class="btn" onclick="openReport(${r.id},true)">Report a problem</button></div>
      <p class="small muted" style="margin-top:12px">Or ask the <a href="#chat" onclick="go('chat');return false" style="font-weight:700">AI assistant</a>.</p></div></div>
-     ${(b.extras||[]).length?`<div class="card" style="margin-top:16px"><h3>Room service charges</h3>${b.extras.map(x=>`<div class="qline"><span>${x.qty}× ${esc(x.name)}</span><span>${inr(x.price*x.qty)}</span></div>`).join('')}</div>`:''}`;
+     <div class="card" style="margin-top:16px"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0">Food orders</h3><button class="btn gold sm" onclick="orderFood('${b.id}')">${ico('cup',16)} Order food</button></div><div id="stayOrders"></div>${S.settings.foodAuto?'<p class="small muted" style="margin-top:12px">Demo mode: the kitchen and waiter steps are simulated automatically.</p>':''}</div>
+     <div class="card" style="margin-top:16px"><h3>Your bill so far</h3><div id="stayBill"></div><p class="small muted" style="margin-top:10px">Food and drink charges are added as soon as you order and settled at check-out.</p></div>`;
   }else if(b.status==='checked-out'){
     FB=0;h+=`<div class="row" style="margin-top:18px"><button class="btn" onclick="showBill(booking('${b.id}'))">${ico('file')} View receipt</button><button class="btn primary" onclick="go('book')">Book again</button></div></div>
     <div class="card"><h3>${b.rating?'Thanks for your feedback':'How was your stay?'}</h3>${b.rating?`<div class="stars" style="font-size:24px">${stars(b.rating)}</div><p class="muted" style="margin-top:8px">You earned ${Math.floor(billTotal(b)/100)} loyalty points on this stay.</p>`
@@ -1276,6 +1492,11 @@ function drawStayLive(){
   if(l){const eco=r.ac.mode==='eco';l.innerHTML=`<div class="live-grid"><div><small>Temperature</small><b>${r.temp.toFixed(1)}°C</b></div><div><small>AC</small><b>${r.ac.mode==='off'?'Off':r.ac.mode==='eco'?'Eco':r.ac.set+'°C'}</b></div><div><small>Lights</small><b>${r.lights?'On':'Off'}</b></div></div>
    <p class="note small" style="margin-top:12px">${eco?'You seem to be out. AI switched to eco mode and will restore '+r.ac.set+'°C when you return.':r.presence?'Your room is set to your preferred '+r.ac.set+'°C.':'Room sensors detect nobody inside right now.'}</p>`}
   if(c&&!c.dataset.ready){c.dataset.ready=1;drawStayCtl()}
+  const sb=$('#stayBill'),stt=$('#stayTotal');if(stt)stt.textContent=inr(billTotal(b));
+  if(sb){const bh=billHTML(b,false);if(sb.dataset.h!==bh){sb.dataset.h=bh;sb.innerHTML=bh}}
+  const so=$('#stayOrders');
+  if(so){const os=S.orders.filter(o=>o.bookingId===b.id).sort((x,y)=>y.t.placed-x.t.placed),sig=os.map(o=>o.id+o.status+o.roomId).join()+Math.floor(Date.now()/60000);
+    if(so.dataset.sig!==sig){so.dataset.sig=sig;so.innerHTML=os.length?os.map(orderTrack).join(''):'<div class="empty">No food orders yet. Hungry? Tap Order food.</div>'}}
 }
 function drawStayCtl(){
   const b=booking(UI.session),c=$('#stayCtl');if(!b||!c)return;const r=room(b.roomId);
@@ -1385,7 +1606,7 @@ VIEWS.reports=()=>{
   const byStatus=[['booked','Upcoming'],['checked-in','In house'],['checked-out','Done'],['cancelled','Cancelled']].map(x=>({label:x[1],value:S.bookings.filter(b=>b.status===x[0]).length}));
   const top=guestList().sort((a,b)=>b.spend-a.spend).slice(0,5);const rv=S.reviews;
   return `<div class="page-head"><div><h2>Reports</h2><p>Revenue and performance across all bookings.</p></div><button class="btn" onclick="exportBookings()">${ico('download')} Export bookings CSV</button></div>
-  <div class="grid g-kpi">${kpi('ok','trend',inr(rev),'Booked revenue (before GST)')}${kpi('','bed',inr(adr),'Average daily rate (ADR)')}${kpi('lamp','chart',inr(adr*occ/100),'Revenue per available room')}${kpi(canc?'bad':'ok','calendar',S.bookings.length?Math.round(canc/S.bookings.length*100)+'%':'0%','Cancellation rate')}${kpi('','star',avgRating().toFixed(1),'Average rating')}</div>
+  <div class="grid g-kpi">${kpi('ok','trend',inr(rev),'Booked room revenue (before GST)')}${kpi('lamp','cup',inr(sum(S.orders.filter(o=>o.status==='delivered').map(o=>o.total))),'Food and drink revenue')}${kpi('','bed',inr(adr),'Average daily rate (ADR)')}${kpi('lamp','chart',inr(adr*occ/100),'Revenue per available room')}${kpi(canc?'bad':'ok','calendar',S.bookings.length?Math.round(canc/S.bookings.length*100)+'%':'0%','Cancellation rate')}${kpi('','star',avgRating().toFixed(1),'Average rating')}</div>
   <div class="grid g-2" style="margin-top:16px"><div class="card"><h3>Revenue by room type (₹ thousand)</h3>${barChart(byType,{labels:true,fmt:v=>v+'k',label:'Revenue by room type'})}</div>
    <div class="card"><h3>Bookings by status</h3>${barChart(byStatus,{labels:true,label:'Bookings by status'})}</div>
    <div class="card"><h3>Top guests</h3>${top.map(g=>`<div class="item"><div class="main"><b>${esc(g.name)}</b> ${chip(g.tier==='Platinum'||g.tier==='Gold'?'brand':'neutral',g.tier)}<div class="small muted">${g.visits} visit${g.visits===1?'':'s'}</div></div><b>${inr(g.spend)}</b></div>`).join('')||'<div class="empty">No guest spend yet</div>'}</div>
@@ -1399,7 +1620,9 @@ VIEWS.settings=()=>{
   <div class="grid g-2"><div class="card"><h3>AI and automation</h3><div class="stack">
    <label class="switch"><input type="checkbox" ${s.auto?'checked':''} onchange="S.settings.auto=this.checked;save();toast('AI auto-control '+(this.checked?'on':'off'))"><span></span>AI auto-control of lights and AC</label>
    <div class="field"><label for="ecoSel">Switch empty rooms to eco after</label><select id="ecoSel" onchange="S.settings.eco=+this.value;save();toast('Eco delay set to '+this.value+' minutes','ok')">${[10,15,30].map(m=>`<option value="${m}" ${s.eco===m?'selected':''}>${m} minutes</option>`).join('')}</select></div>
-   <label class="switch"><input type="checkbox" ${s.dynamic?'checked':''} onchange="S.settings.dynamic=this.checked;save();toast('Dynamic pricing '+(this.checked?'on':'off'))"><span></span>Dynamic pricing for new bookings</label></div></div>
+   <label class="switch"><input type="checkbox" ${s.dynamic?'checked':''} onchange="S.settings.dynamic=this.checked;save();toast('Dynamic pricing '+(this.checked?'on':'off'))"><span></span>Dynamic pricing for new bookings</label>
+   <label class="switch"><input type="checkbox" ${s.kitchen?'checked':''} onchange="setKitchen(this.checked)"><span></span>Kitchen accepting food orders</label>
+   <label class="switch"><input type="checkbox" ${s.foodAuto?'checked':''} onchange="setFoodAuto(this.checked)"><span></span>Demo auto-progress for food orders</label></div></div>
   <div class="card"><h3>Tax and security</h3><form class="stack" onsubmit="saveGst(event)" novalidate><div class="field"><label for="gstIn">GST rate (%)</label><input id="gstIn" type="number" min="0" max="28" step="1" value="${s.gst}"></div><div id="gstMsg"></div><button class="btn" type="submit">Save GST</button></form>
    <hr style="border:0;border-top:1px solid var(--line);margin:18px 0"><form class="stack" onsubmit="savePin(event)" novalidate><div class="field"><label for="pinIn">New staff PIN (4 digits)</label><input id="pinIn" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password"></div><div id="pinMsg"></div><button class="btn" type="submit">Change PIN</button></form></div>
   <div class="card"><h3>Data</h3><div class="stack"><button class="btn" onclick="exportBookings()">${ico('download')} Export bookings (CSV)</button><button class="btn" onclick="exportBackup()">${ico('download')} Backup all data (JSON)</button><button class="btn" onclick="restoreDlg()">${ico('file')} Restore from backup</button><button class="btn danger" onclick="resetData()">Reset demo data</button></div></div>
@@ -1448,8 +1671,9 @@ function micChat(){
     rec.onend=()=>{MIC=false};MIC=true;toast('Listening…');rec.start()}catch(e){MIC=false;toast('Voice input is unavailable right now','bad')}
 }
 const INTENTS=[['greet',/^(hi|hello|hey|namaste|good (morning|evening|afternoon))\b/],['thanks',/\b(thanks|thank you|thx)\b/],
+ ['order',/(order (some |a )?(food|something|dinner|lunch|breakfast|meal|snack)|hungry|room service|food order|(where|track|status).*(food|order)|my order)/],
  ['issue',/(not working|broken|leak|problem|issue|noise|smell|stuck|dirty)/],['temp',/\b(ac|a\/c|air ?con\w*|temperature|too (hot|cold|warm)|cooler|warmer)\b/],
- ['lights',/\blights?\b/],['late',/(late check|extend|extra night)/],['service',/(towel|pillow|blanket|toiletr|clean|housekeeping|laundry|room service|water bottle|soap)/],
+ ['lights',/\blights?\b/],['late',/(late check|extend|extra night)/],['service',/(towel|pillow|blanket|toiletr|clean|housekeeping|laundry|water bottle|soap)/],
  ['recommend',/(recommend|suggest|best room|which room|family|couple|budget|cheap|suite|quiet|view)/],['avail',/(available|availability|vacant|free room|rooms left|any room)/],
  ['price',/(price|rate|cost|tariff|charges?|how much)/],['book',/\b(book|reserve|reservation)\b/],['times',/(check ?-?in|check ?-?out|timing)/],
  ['wifi',/(wi-?fi|internet|password)/],['food',/(breakfast|lunch|dinner|restaurant|food|menu|cafe)/],['amen',/(pool|gym|spa|parking|amenit)/],['cancel',/cancel/],['help',/(help|what can you do)/]];
@@ -1494,7 +1718,16 @@ function runIntent(intent,t,rn){
    case'book':return{text:'I can help you book. Use the booking page and I will rank the best rooms for you.',links:[['Open booking',"go('book')"]]};
    case'times':return{text:'Check-in is from 2:00 PM and check-out is by 11:00 AM. Late check-out can be arranged for a fee, subject to availability.'};
    case'wifi':return{text:'Connect to "SmartStay-Guest". The password is welcome2026. Wi-Fi is free for all guests.'};
-   case'food':return{text:'Breakfast is served 7:00–10:30 AM and the all-day café is open 11:00 AM–11:00 PM. You can order from the room service menu on My stay.',links:[['Open My stay',"go('stay')"]]};
+   case'order':{
+     const sr=sessionRoom(),bk=UI.session&&booking(UI.session);
+     if(/(where|track|status|my order)/.test(t)&&!/(order (some|a)\b)/.test(t)){
+       const os=bk?S.orders.filter(o=>o.bookingId===bk.id).sort((x,y)=>y.t.placed-x.t.placed):[];
+       if(!os.length)return{text:'You have no food orders yet.'+(sr?' Would you like to see the menu?':''),links:sr?[['Open menu',"orderFood('"+UI.session+"')"]]:undefined};
+       const o=os[0];return{text:'Order '+o.id+': '+ORD[o.status][1]+'. '+({placed:'The kitchen has it.',preparing:o.chef+' is cooking it.',ready:'Waiting for a waiter.',delivering:o.waiter+' is on the way to your room.',delivered:'It was delivered at '+clock(o.t.delivered)+'.',cancelled:'It was cancelled.'})[o.status],links:[['Track on My stay',"go('stay')"]]}}
+     if(UI.role==='staff')return{text:'Food orders are managed on the Kitchen page. You can also take an order from a room card.',links:[['Open Kitchen',"go('kitchen')"]]};
+     if(!sr)return{text:'Food ordering is for guests who have checked in. Open My stay, sign in with your booking ID and mobile number, then order from the menu.',links:[['Open My stay',"go('stay')"]]};
+     return{text:'Sure. Pick what you like from the menu and add any special instructions. A chef will cook it and a waiter will bring it to Room '+sr.number+'.',links:[['Open menu',"orderFood('"+UI.session+"')"]]}}
+   case'food':return{text:'Breakfast is served 7:00–10:30 AM and the all-day café is open 11:00 AM–11:00 PM. Checked-in guests can order from the in-room menu.',links:[['Open My stay',"go('stay')"]]};
    case'amen':return{text:'Pool: 6 AM–9 PM. Gym: 24 hours. Spa: 10 AM–8 PM, booking at the front desk. Parking is free for guests.'};
    case'cancel':return{text:'You can cancel free of charge from the My stay page before check-in.',links:[['Open My stay',"go('stay')"]]};
    case'help':return{text:'I can: check availability and rates, recommend a room, change AC or lights, request towels or cleaning, report a problem, and answer questions about timings, Wi-Fi and food.',chips:['Rooms available today','Extra towels please','AC too hot']};
@@ -1523,14 +1756,14 @@ const raw2title=t=>{const s=t.replace(ROOMRE,'').replace(/\s+/g,' ').trim();retu
 ['go','goRooms','setTheme','openRole','staffLogin','signOutStaff','openBell','openMore','resetData','exportBookings','exportBackup','restoreDlg','restoreNow','downloadTxt','copyTxt',
  'completeTask','startTask','assignTask','resolveTicket','assignTicket','checkInBooking','checkOutBooking','cancelBooking','openMove','moveGuest','extendDlg','extendStay','orderFood','cartAdd','placeOrder',
  'submitFeedback','showBill','injectFault','askOut','openRoom','acMode','acStep','toggleLights','searchRooms','reviewRoom','applyPromo','confirmBooking','findStay','gTemp','gAC','gLights','guestReq','openKey','unlockDoor',
- 'openReport','sendReport','saveGst','savePin','sendChat','chatSay','micChat','quickSearch','openGuest','calOpen','drawRooms','drawBookings','drawGuests','drawEnergy','drawStayLive','drawStayCtl','drawChat','drawQuote','syncDates']
+ 'openReport','sendReport','saveGst','savePin','sendChat','chatSay','micChat','quickSearch','openGuest','calOpen','menuCat','menuVeg','orderAccept','orderReady','orderDispatch','orderDeliver','orderCancel','askCancelOrder','pickStaff','setKitchen','setFoodAuto','drawMenu','drawCartBar','drawRooms','drawBookings','drawGuests','drawEnergy','drawStayLive','drawStayCtl','drawChat','drawQuote','syncDates']
  .forEach(n=>{if(typeof window[n]==='function')window[n]=guard(window[n],n)});
 
 (function init(){
   try{localStorage.setItem('__t','1');localStorage.removeItem('__t')}catch(e){STORE_OK=false}
   UI=Object.assign(defaultUI(),lsGet(UKEY)||{});
   const stored=lsGet(KEY);
-  if(validData(stored))S=stored;
+  if(validData(stored)){S=stored;normalize(S)}
   else{seed();if(stored)setTimeout(()=>toast('Saved data looked damaged, so the demo was reset.','bad'),400)}
   if(UI.role!=='guest'&&UI.role!=='staff')UI.role='guest';
   const h=(location.hash||'').replace('#','');if(h&&NAV[UI.role].some(n=>n[0]===h))UI.view=h;
